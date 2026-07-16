@@ -16,12 +16,8 @@ def normalize_database_url(raw_url: str) -> str:
     return raw_url
 
 
-DATABASE_URL = os.getenv("DATABASE_URL")
-
-if not DATABASE_URL:
-    raise RuntimeError("DATABASE_URL environment variable is required")
-
-DATABASE_URL = normalize_database_url(DATABASE_URL)
+DEFAULT_SQLITE_URL = "sqlite:///./books.db"
+DATABASE_URL = normalize_database_url(os.getenv("DATABASE_URL", DEFAULT_SQLITE_URL))
 
 
 class Base(DeclarativeBase):
@@ -91,7 +87,7 @@ def get_db() -> Session:
 
 @app.get("/")
 def read_root() -> dict[str, str]:
-    return {"message": "Books API with Render PostgreSQL is running"}
+    return {"message": "Books API is running", "database": DATABASE_URL}
 
 
 @app.get("/books", response_model=list[Book])
